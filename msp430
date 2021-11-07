@@ -1,0 +1,186 @@
+#include<msp430x14x.h>
+#include "lcd.h"
+#include "portyLcd.h"
+
+unsigned char i;
+unsigned char znak, znak1, znak2, znak3, znak4, znak5, znak6, znak7;
+
+void zadanie2(char napis[], int linia){ // przekazujemy tablicę znaków oraz linie, w której chcemy wyświetlić tekst
+	int n;
+	n = 0;
+  if (linia == 1){
+  	SEND_CMD(DD_RAM_ADDR); // wybór 1 linii
+	}
+  	else if ( linia == 2){
+  		SEND_CMD(DD_RAM_ADDR2); // wybór 2 linii
+  	}
+  	
+  	while (napis[n] != 0x00){ // pętla wypisująca napis
+		SEND_CHAR(napis[n]); // wyświetlnie pojedynczego znaku
+		n++;
+  }
+}
+
+void zadanie3(int wartoscPrzesuniecia, int kierunek){ // przekazujemy tablicę znaków oraz kierunek, w który chcemy przesunąć tekst
+  // 1 w prawo
+  // 2 w lewo
+	int n;
+	n = 0;
+  if (kierunek == 1){ // wybór kierunku przesunięcia w prawo
+  	for (i=0;i< wartoscPrzesuniecia;i++)
+ 	{
+   		SEND_CMD(DATA_ROL_RIGHT);                  // przesuwanie napisu w prawo    
+    	Delayx100us(250);                        // opóźnienie
+  	}
+	}
+  	else if ( kierunek == 2){ // wybór kierunku przesunięcia w lewo
+	  
+  		for (i=0;i< wartoscPrzesuniecia;i++)
+ 	{
+  		SEND_CMD(DATA_ROL_LEFT);                  // przesuwanie napisu w lewo    
+    	Delayx100us(250);                        // opóźnienie
+  	}
+  	}
+  	
+  
+}
+
+
+void zadanie4(int kolumna, int linia){ // przekazujemy kolumnę i linię w której chcemy
+	int n;
+	n = 0;
+  if (linia == 1){ // wybór 1 linii
+  	SEND_CMD(DD_RAM_ADDR+kolumna); // ustawienie kursora w 1 linii oraz przekazanej kolumny
+	SEND_CHAR('m'); // wypisanie znaku na ekran w przekazanej pozycji
+	}
+  	else if ( linia == 2){ // wybór 2 linii
+  		SEND_CMD(DD_RAM_ADDR2+kolumna); // ustawienie kursora w 2 linii oraz przekazanej kolumny
+		SEND_CHAR('m'); // wypisanie znaku na ekran w przekazanej pozycji
+  	}
+}
+
+void zadanie5(char napis[]){
+	int n;
+	n = 0;
+    while (napis[n] != 0x00){ // pętla wypisująca napis
+	  if(napis[n] ==  'ć'){ // sprawdzenie czy znak == 'ć'
+		SEND_CHAR(0); // wyświetlnie 'ć'
+	  }
+	  else if(napis[n] == 'ż'){ // sprawdzenie czy znak == 'ż'
+		SEND_CHAR(1); // wyświetlnie 'ż'
+	  }
+	  else if(napis[n] == 'ę'){ // sprawdzenie czy znak == 'ę'
+	  	SEND_CHAR(2); // wyświetlnie 'ę'
+	  }
+	  else{
+		SEND_CHAR(napis[n]); // wyświetlnie pojedynczego znaku
+	  }
+	  n++;
+	}
+}
+
+
+
+void main( void )
+{
+  WDTCTL=WDTPW+ WDTHOLD; //wyłączenie mechanizmu Watchdog 
+char customChar3[] = {0x00,0x02,0x04,0x0e,0x10,0x10,0x10,0x0e,0x00,0x04,0x00,0x1f,0x02,0x04,0x08,0x1f,0x00,0x00,0x0e,0x11,0x1e,0x10,0x0f,0x01};
+
+InitPortsLcd();                               // inicjalizacja portów  
+InitLCD();                                    // inicjalizacja LCD
+clearDisplay();  
+
+
+//wgywanie   
+SEND_CMD(CG_RAM_ADDR);
+for(int i=0;i<24;i++){
+  SEND_CHAR(customChar3[i]);
+}
+SEND_CMD(DD_RAM_ADDR);
+
+
+P2DIR |= BIT1 ;                               // STATUS LED
+WDTCTL=WDTPW+ WDTHOLD;                        // zatrzymanie WDT
+
+                             // czyszczenie LCD  
+
+char napis[] = "ARCHITKETURA";
+char napis2[] = "mitrężyć";
+
+//while (1)                                    // nieskończona pętla 
+//{
+P2OUT ^=BIT1;                                // zmiana stanu diody na przeciwny
+
+
+
+
+
+//zadanie2(napis, 2);
+//zadanie3(4, 1);
+zadanie5(napis2);
+//zadanie4(1, 1);
+//zadanie4(3, 2);
+//zadanie5(napis2);
+
+/*
+for (i=0;i<16;i++)
+ {
+   SEND_CMD(DATA_ROL_LEFT);                  // przesuwanie napisu w lewo    
+    Delayx100us(250);                        // opóźnienie
+  }
+*/
+ //}
+
+
+}
+
+/*
+#include<msp430x14x.h>
+#include "lcd.h"
+#include "portyLcd.h"
+
+unsigned char i;
+unsigned char znak, znak1, znak2, znak3, znak4, znak5, znak6, znak7;
+
+void main( void )
+{
+znak='C';
+znak1='O';
+znak2='V';
+znak3='I';
+znak4='D';
+znak5='-';
+znak6='1';
+znak7='9';
+
+P2DIR |= BIT1 ;                               // STATUS LED
+WDTCTL=WDTPW+ WDTHOLD;                        // zatrzymanie WDT
+
+InitPortsLcd();                               // inicjalizacja portów  
+InitLCD();                                    // inicjalizacja LCD
+clearDisplay();                               // czyszczenie LCD  
+
+SEND_CHAR(znak);
+SEND_CHAR(znak1);
+SEND_CHAR(znak2);
+SEND_CHAR(znak3);
+SEND_CHAR(znak4);
+SEND_CHAR(znak5);
+SEND_CHAR(znak6);
+SEND_CHAR(znak7);
+
+while (1)                                    // nieskończona pętla 
+{
+P2OUT ^=BIT1;                                // zmiana stanu diody na przeciwny
+
+/*
+for (i=0;i<16;i++)
+ {
+   SEND_CMD(DATA_ROL_LEFT);                  // przesuwanie napisu w lewo    
+    Delayx100us(250);                        // opóźnienie
+  }
+*/
+/*
+ }
+}
+*/
